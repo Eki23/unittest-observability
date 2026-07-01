@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3] - 2023-10-27
+
+### Added
+
+- `run_tests_with_coverage.bat` script for local test execution with coverage.
+
+## [0.1.2] - 2023-10-27
+
+### Added
+
+- Coverage measurement using `coverage.py`.
+
+### Changed
+
+- GitHub Actions workflow updated to include test execution with coverage and report generation.
+- Added `coverage` as a development dependency in `pyproject.toml`.
+- Renamed GitHub Actions workflow file from `publish.yml` to `ci_cd_pipeline.yml`.
+
 ## [0.1.1] - 2023-10-27
 
 ### Added
@@ -26,7 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated all internal and test import paths to reflect the new project structure.
 - Updated `src/unittest_observability/__init__.py` to expose mixins at the top-level for simplified imports.
 - Switched `TimingMixin` and `ResultMixin` to use `time.monotonic()` for more accurate duration measurements.
-- **Enhanced `InventoryMixin`**: Now discovers all test methods in `setUpClass` and reports on discovered, ran, and skipped tests in `tearDownClass`.
+- Enhanced `InventoryMixin`: Now discovers all test methods in `setUpClass` and reports on discovered, ran, and skipped tests in `tearDownClass`.
 - Updated `README.md` usage examples to reflect simplified top-level imports and new structure.
 
 ## [0.1.0] - 2023-10-27

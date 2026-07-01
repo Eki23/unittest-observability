@@ -54,7 +54,12 @@ for test_info in detailed_results:
 
 ## Development and Publishing
 
-This project uses GitHub Actions for continuous integration and publishing. A workflow is configured to build and publish the package to TestPyPI on pushes to the `main` branch or when a new tag (e.g., `v1.0.0`) is created. Ensure you have a `TEST_PYPI_API_TOKEN` GitHub Secret configured for publishing.
+This project uses GitHub Actions for continuous integration and publishing. A workflow is configured to build and publish the package to TestPyPI on pushes to the `main` branch or when a new tag (e.g., `v1.0.0`) is created. The CI pipeline now also includes **coverage measurement** to ensure code quality. Ensure you have a `TEST_PYPI_API_TOKEN` GitHub Secret configured for publishing.
+
+For local development, you can run tests with coverage using the provided batch script:
+```bash
+run_tests_with_coverage.bat
+```
 
 ## Changelog
 
