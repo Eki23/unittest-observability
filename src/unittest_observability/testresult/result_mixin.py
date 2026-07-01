@@ -13,11 +13,11 @@ class ResultMixin(unittest.TestResult):
         self._current_test_start_time = None
 
     def startTest(self, test):
-        self._current_test_start_time = time.time()
+        self._current_test_start_time = time.monotonic() # Changed to monotonic
         super().startTest(test)
 
     def _add_result(self, test, outcome, err=None, reason=None):
-        end_time = time.time()
+        end_time = time.monotonic() # Changed to monotonic
         duration = end_time - self._current_test_start_time if self._current_test_start_time else 0
         result_info = {
             "id": test.id(),

@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2023-10-27
+
+### Added
+
+- GitHub Actions workflow for publishing to TestPyPI (`.github/workflows/publish.yml`).
+
+### Fixed
+
+- Resolved `ValueError` in `ResultMixin._add_result` when handling skipped tests.
+- Corrected `test_result_mixin_collection` assertion for `InventoryMixin` to account for skipped tests not calling `setUp`.
+
+### Changed
+
+- Marked `test_failure_case` and `test_error_case` with `@unittest.expectedFailure` in `test_result_mixin.py`.
+- Refactored `TimingMixin` to no longer inherit from `unittest.TestCase`, making it a pure mixin.
+- Reorganized project structure:
+    - `timing_mixin.py` and `inventory_mixin.py` moved to `src/unittest_observability/testcase/mixins/`.
+    - `result_mixin.py` moved to `src/unittest_observability/testresult/`.
+- Updated all internal and test import paths to reflect the new project structure.
+- Updated `src/unittest_observability/__init__.py` to expose mixins at the top-level for simplified imports.
+- Switched `TimingMixin` and `ResultMixin` to use `time.monotonic()` for more accurate duration measurements.
+- Updated `README.md` usage examples to reflect simplified top-level imports and new structure.
+
 ## [0.1.0] - 2023-10-27
 
 ### Added

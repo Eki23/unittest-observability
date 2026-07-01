@@ -13,14 +13,14 @@ class TimingMixin: # Removed inheritance from unittest.TestCase
     def setUpClass(cls):
         # Call super().setUpClass() first to ensure TestCase's setUpClass runs
         super().setUpClass() 
-        cls._class_start_time = time.time()
+        cls._class_start_time = time.monotonic() # Changed to monotonic
         cls._method_timings = [] # Ensure it's fresh for each class
 
     @classmethod
     def tearDownClass(cls):
         # Call super().tearDownClass() first to ensure TestCase's tearDownClass runs
         super().tearDownClass()
-        class_end_time = time.time()
+        class_end_time = time.monotonic() # Changed to monotonic
         class_duration = class_end_time - cls._class_start_time if cls._class_start_time else 0
 
         print(f"\n--- Timing Statistics for Test Class: {cls.__name__} ---")
@@ -48,12 +48,12 @@ class TimingMixin: # Removed inheritance from unittest.TestCase
     def setUp(self):
         # Call super().setUp() first to ensure TestCase's setUp runs
         super().setUp()
-        self._method_start_time = time.time()
+        self._method_start_time = time.monotonic() # Changed to monotonic
 
     def tearDown(self):
         # Call super().tearDown() first to ensure TestCase's tearDown runs
         super().tearDown()
-        method_end_time = time.time()
+        method_end_time = time.monotonic() # Changed to monotonic
         method_duration = method_end_time - self._method_start_time
         # self.id() is a method of unittest.TestCase, which the class mixing this will inherit from
         self.__class__._method_timings.append({
