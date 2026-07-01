@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated all internal and test import paths to reflect the new project structure.
 - Updated `src/unittest_observability/__init__.py` to expose mixins at the top-level for simplified imports.
 - Switched `TimingMixin` and `ResultMixin` to use `time.monotonic()` for more accurate duration measurements.
+- **Enhanced `InventoryMixin`**: Now discovers all test methods in `setUpClass` and reports on discovered, ran, and skipped tests in `tearDownClass`.
 - Updated `README.md` usage examples to reflect simplified top-level imports and new structure.
 
 ## [0.1.0] - 2023-10-27

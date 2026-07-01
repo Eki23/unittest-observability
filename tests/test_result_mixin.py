@@ -77,15 +77,23 @@ class TestResultCollection(unittest.TestCase):
         for res in collected_results:
             self.assertGreaterEqual(res['duration'], 0)
 
-        # Check InventoryMixin
-        inventory = TestResultMixin.get_test_inventory()
-        # Only 4 tests will be in the inventory because the skipped test does not call setUp
-        self.assertEqual(len(inventory), 4) 
-        self.assertIn('test_result_mixin.TestResultMixin.test_success_case', inventory)
-        self.assertIn('test_result_mixin.TestResultMixin.test_failure_case', inventory)
-        # self.assertIn('test_result_mixin.TestResultMixin.test_skipped_case', inventory) # Skipped tests are not in inventory
-        self.assertIn('test_result_mixin.TestResultMixin.test_error_case', inventory)
-        self.assertIn('test_result_mixin.TestResultMixin.test_long_duration_case', inventory)
+        # Check InventoryMixin - what actually ran
+        ran_inventory = TestResultMixin.get_test_inventory()
+        # Only 4 tests will be in the ran_inventory because the skipped test does not call setUp
+        self.assertEqual(len(ran_inventory), 4) 
+        self.assertIn('test_result_mixin.TestResultMixin.test_success_case', ran_inventory)
+        self.assertIn('test_result_mixin.TestResultMixin.test_failure_case', ran_inventory)
+        self.assertIn('test_result_mixin.TestResultMixin.test_error_case', ran_inventory)
+        self.assertIn('test_result_mixin.TestResultMixin.test_long_duration_case', ran_inventory)
+
+        # Check InventoryMixin - what was expected to run (all discovered tests)
+        expected_inventory = TestResultMixin.get_expected_inventory()
+        self.assertEqual(len(expected_inventory), 5) # All 5 tests are discovered
+        self.assertIn('test_result_mixin.TestResultMixin.test_success_case', expected_inventory)
+        self.assertIn('test_result_mixin.TestResultMixin.test_failure_case', expected_inventory)
+        self.assertIn('test_result_mixin.TestResultMixin.test_skipped_case', expected_inventory)
+        self.assertIn('test_result_mixin.TestResultMixin.test_error_case', expected_inventory)
+        self.assertIn('test_result_mixin.TestResultMixin.test_long_duration_case', expected_inventory)
 
 
 if __name__ == '__main__':

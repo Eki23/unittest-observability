@@ -7,7 +7,7 @@ This is a Python project for unittest observability.
 This library provides several mixins to enhance `unittest` with observability features:
 
 -   **`TimingMixin`**: Integrates with `unittest.TestCase` to automatically measure and report the execution time of each test method. It now uses `time.monotonic()` for more accurate duration measurements, helping in identifying slow tests and performance bottlenecks.
--   **`InventoryMixin`**: Designed for `unittest.TestCase`, this mixin collects a comprehensive list of identifiers for all tests that are executed. Useful for tracking test coverage or generating reports of run tests.
+-   **`InventoryMixin`**: Designed for `unittest.TestCase`, this mixin now discovers all `test_*` methods within a class during `setUpClass`. In `tearDownClass`, it reports on the total number of tests discovered, how many actually ran, and identifies any tests that were skipped or not executed. This provides a comprehensive inventory and helps diagnose missing or skipped tests.
 -   **`ResultMixin`**: Extends `unittest.TestResult` to gather detailed information about the outcome of each test, including success, failure, errors, skips, and execution duration. It also uses `time.monotonic()` for precise duration tracking and provides full tracebacks for issues. This provides a rich dataset for analysis and reporting.
 
 ## Usage
@@ -29,7 +29,7 @@ class MyTests(TimingMixin, InventoryMixin, unittest.TestCase):
 # inventory = MyTests.get_test_inventory()
 ```
 
-`TimingMixin` will automatically print timing statistics to `sys.stdout` after the test class finishes.
+`TimingMixin` will automatically print timing statistics to `sys.stdout` after the test class finishes. `InventoryMixin` will print its report in `tearDownClass`.
 
 ### `ResultMixin`
 

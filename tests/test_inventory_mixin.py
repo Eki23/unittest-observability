@@ -1,48 +1,69 @@
 import unittest
+import time
+from io import StringIO
+from unittest.mock import patch
 from unittest_observability import InventoryMixin
 
 class TestInventoryMixin(InventoryMixin, unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        # Clear inventory before running tests in this class
-        cls._test_inventory = []
-        super().setUpClass()
+        super().setUpClass() # Call mixin's setUpClass first to initialize inventories
 
     def test_first_item_in_inventory(self):
-        # This test will add itself to the inventory
         self.assertIn(self.id(), self.get_test_inventory())
+        self.assertIn(self.id(), self.get_expected_inventory())
 
     def test_second_item_in_inventory(self):
-        # This test will also add itself to the inventory
         self.assertIn(self.id(), self.get_test_inventory())
+        self.assertIn(self.id(), self.get_expected_inventory())
 
-    def test_inventory_size(self):
-        # After both tests run, the inventory should contain both
-        # Note: This test might run before or after the others depending on test runner.
-        # For a reliable check, we'd typically inspect after all tests in a suite.
-        # For now, we'll just check if it's growing.
-        pass
+    @unittest.skip("Demonstrating skipped test for inventory")
+    def test_skipped_item(self):
+        pass # This test should be in expected_inventory but not in _test_inventory
+
+    @patch('sys.stdout', new_callable=StringIO)
+    def test_inventory_reporting(self, mock_stdout):
+        # This test itself will run, but we're interested in the tearDownClass output
+        # To capture tearDownClass output, we need to run a suite that includes this class
+        suite = unittest.TestSuite()
+        suite.addTest(unittest.makeSuite(TestInventoryMixin))
+        runner = unittest.TextTestRunner()
+        runner.run(suite)
+
+        output = mock_stdout.getvalue()
+        
+        # Assertions for the tearDownClass output
+        self.assertIn("--- Inventory Statistics for Test Class: TestInventoryMixin ---", output)
+        self.assertIn("Total Test Methods Discovered: 4", output) # 3 actual tests + this reporting test
+        self.assertIn("Total Test Methods Actually Ran: 3", output) # 3 actual tests (skipped one doesn't run)
+        self.assertIn("Total Test Methods Skipped/Not Run: 1", output)
+        self.assertIn("Skipped/Not Run Tests:", output)
+        self.assertIn("  - test_inventory_mixin.TestInventoryMixin.test_skipped_item", output)
+        self.assertIn("--------------------------------------------------", output)
+
 
 class AnotherTestClass(InventoryMixin, unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        # Clear inventory before running tests in this class
-        cls._test_inventory = []
-        super().setUpClass()
+        super().setUpClass() # Call mixin's setUpClass first to initialize inventories
 
     def test_another_item(self):
         self.assertIn(self.id(), self.get_test_inventory())
+        self.assertIn(self.id(), self.get_expected_inventory())
 
-# To properly test the full inventory, we'd run a test suite and then inspect InventoryMixin.get_test_inventory()
-# outside of the test class methods.
-# For example:
-# if __name__ == '__main__':
-#     suite = unittest.TestSuite()
-#     suite.addTest(unittest.makeSuite(TestInventoryMixin))
-#     suite.addTest(unittest.makeSuite(AnotherTestClass))
-#     runner = unittest.TextTestRunner()
-#     runner.run(suite)
-#     print("Final Inventory:", InventoryMixin.get_test_inventory())
+    @patch('sys.stdout', new_callable=StringIO)
+    def test_another_reporting(self, mock_stdout):
+        suite = unittest.TestSuite()
+        suite.addTest(unittest.makeSuite(AnotherTestClass))
+        runner = unittest.TextTestRunner()
+        runner.run(suite)
+
+        output = mock_stdout.getvalue()
+        self.assertIn("--- Inventory Statistics for Test Class: AnotherTestClass ---", output)
+        self.assertIn("Total Test Methods Discovered: 2", output)
+        self.assertIn("Total Test Methods Actually Ran: 2", output)
+        self.assertIn("All discovered test methods were executed.", output)
+
 
 if __name__ == '__main__':
     unittest.main()
