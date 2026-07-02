@@ -13,6 +13,7 @@ keywords = ["unittest", "observability", "mixins"]
 authors = [
     {name = "Christian Ekiza", email = "ekiza23@gmail.com"},
 ]
+license-files = ["LICENSE"] # Moved here from [tool.setuptools]
 
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -37,7 +38,7 @@ BugTracker = "https://github.com/Eki23/unittest-observability/issues"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
-license-files = ["LICENSE"]
+# license-files = ["LICENSE"] # Removed from here
 
 [tool.setuptools.packages.find]
 where = ["src"]
