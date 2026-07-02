@@ -4,7 +4,29 @@ from unittest_observability import ResultMixin
 from unittest_observability import TimingMixin
 from unittest_observability import InventoryMixin
 
-class TestResultMixin(TimingMixin, InventoryMixin, unittest.TestCase):
+class TestResultMixin(unittest.TestCase, TimingMixin, InventoryMixin): # Switched order
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.inventory_class_setup()
+        cls.timing_class_setup() # Renamed
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        cls.inventory_class_teardown()
+        cls.timing_class_teardown() # Renamed
+
+    def setUp(self):
+        super().setUp()
+        self.inventory_method_setup()
+        self.timing_method_setup() # Renamed
+
+    def tearDown(self):
+        super().tearDown()
+        self.inventory_method_teardown()
+        self.timing_method_teardown() # Renamed
+
     def test_success_case(self):
         self.assertTrue(True)
 

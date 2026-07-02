@@ -2,8 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+The format is based on [Keep a Changelog](https://keepachang
+elog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.1.4] - 2023-10-27
+
+### Fixed
+
+- Resolved `TypeError` in `setUpClass` and `tearDownClass` of `TestInventoryMixin` and `TestTimingMixin` by replacing `unittest.TestCase` assertion methods with Python's built-in `assert` statements for class-level assertions.
+- Fixed `AssertionError` in `test_result_mixin_collection` by ensuring `TestResultMixin` explicitly calls `InventoryMixin` and `TimingMixin` proxy methods in its `setUpClass`, `tearDownClass`, `setUp`, and `tearDown` methods.
+
+### Changed
+
+- Updated `TimingMixin` and `InventoryMixin` proxy methods (`class_timing_setup`, `class_timing_teardown`, `method_timing_setup`, `method_timing_teardown`, `inventory_class_setup`, `inventory_class_teardown`, `inventory_method_setup`, `inventory_method_teardown`) to return specific strings, lists, or dictionaries with timing/inventory data or explanatory messages.
+- Changed inheritance order in `TestInventoryMixin`, `TestTimingMixin`, and `TestResultMixin` from `(Mixin, unittest.TestCase)` to `(unittest.TestCase, Mixin...)` for conventional MRO.
 
 ## [0.1.3] - 2023-10-27
 

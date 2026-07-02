@@ -1,69 +1,71 @@
 import unittest
-import time
-from io import StringIO
-from unittest.mock import patch
-from unittest_observability import InventoryMixin
+import inspect
+from unittest_observability.testcase.mixins.inventory_mixin import InventoryMixin
 
-class TestInventoryMixin(InventoryMixin, unittest.TestCase):
+class TestInventoryMixin(unittest.TestCase, InventoryMixin): # Switched order
     @classmethod
     def setUpClass(cls):
-        super().setUpClass() # Call mixin's setUpClass first to initialize inventories
+        super().setUpClass()
+        setup_message = cls.inventory_class_setup()
+        print(f"\n--- Class Setup: {setup_message} ---")
+        # Assertions for setup_message
+        assert isinstance(setup_message, str)
+        assert "Inventory setup for class" in setup_message
 
-    def test_first_item_in_inventory(self):
-        self.assertIn(self.id(), self.get_test_inventory())
-        self.assertIn(self.id(), self.get_expected_inventory())
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        inventory_stats = cls.inventory_class_teardown()
+        print(f"\n--- Returned Class Inventory Stats for {cls.__name__} ---")
+        print(inventory_stats)
+        print("--------------------------------------------------")
+        # Assertions to check the returned data
+        assert "class_name" in inventory_stats
+        assert "total_test_methods_discovered" in inventory_stats
+        assert "total_test_methods_actually_ran" in inventory_stats
+        assert "total_test_methods_skipped_or_not_run" in inventory_stats
+        assert isinstance(inventory_stats["skipped_or_not_run_tests"], list)
+        assert isinstance(inventory_stats["all_ran_tests"], list)
 
-    def test_second_item_in_inventory(self):
-        self.assertIn(self.id(), self.get_test_inventory())
-        self.assertIn(self.id(), self.get_expected_inventory())
+        # Verify counts
+        expected_count = len([name for name, method in inspect.getmembers(cls, predicate=inspect.isfunction) if name.startswith('test_')])
+        assert inventory_stats["total_test_methods_discovered"] == expected_count
+        assert inventory_stats["total_test_methods_actually_ran"] == 2 # test_one, test_two
+        assert inventory_stats["total_test_methods_skipped_or_not_run"] == 1 # test_skipped
 
-    @unittest.skip("Demonstrating skipped test for inventory")
-    def test_skipped_item(self):
-        pass # This test should be in expected_inventory but not in _test_inventory
-
-    @patch('sys.stdout', new_callable=StringIO)
-    def test_inventory_reporting(self, mock_stdout):
-        # This test itself will run, but we're interested in the tearDownClass output
-        # To capture tearDownClass output, we need to run a suite that includes this class
-        suite = unittest.TestSuite()
-        suite.addTest(unittest.makeSuite(TestInventoryMixin))
-        runner = unittest.TextTestRunner()
-        runner.run(suite)
-
-        output = mock_stdout.getvalue()
+        # Verify skipped tests
+        assert f"{cls.__module__}.{cls.__name__}.test_skipped" in inventory_stats["skipped_or_not_run_tests"]
         
-        # Assertions for the tearDownClass output
-        self.assertIn("--- Inventory Statistics for Test Class: TestInventoryMixin ---", output)
-        self.assertIn("Total Test Methods Discovered: 4", output) # 3 actual tests + this reporting test
-        self.assertIn("Total Test Methods Actually Ran: 3", output) # 3 actual tests (skipped one doesn't run)
-        self.assertIn("Total Test Methods Skipped/Not Run: 1", output)
-        self.assertIn("Skipped/Not Run Tests:", output)
-        self.assertIn("  - test_inventory_mixin.TestInventoryMixin.test_skipped_item", output)
-        self.assertIn("--------------------------------------------------", output)
+        # Verify ran tests
+        assert f"{cls.__module__}.{cls.__name__}.test_one" in inventory_stats["all_ran_tests"]
+        assert f"{cls.__module__}.{cls.__name__}.test_two" in inventory_stats["all_ran_tests"]
 
 
-class AnotherTestClass(InventoryMixin, unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass() # Call mixin's setUpClass first to initialize inventories
+    def setUp(self):
+        super().setUp()
+        setup_message = self.inventory_method_setup()
+        print(f"--- Method Setup: {setup_message} ---")
+        # Assertions for setup_message
+        self.assertIsInstance(setup_message, str)
+        self.assertIn("Inventory: Setting up method", setup_message)
 
-    def test_another_item(self):
-        self.assertIn(self.id(), self.get_test_inventory())
-        self.assertIn(self.id(), self.get_expected_inventory())
+    def tearDown(self):
+        super().tearDown()
+        teardown_message = self.inventory_method_teardown()
+        print(f"--- Method Teardown: {teardown_message} ---")
+        # Assertions for teardown_message
+        self.assertIsInstance(teardown_message, str)
+        self.assertIn("Inventory: Teardown complete for method", teardown_message)
 
-    @patch('sys.stdout', new_callable=StringIO)
-    def test_another_reporting(self, mock_stdout):
-        suite = unittest.TestSuite()
-        suite.addTest(unittest.makeSuite(AnotherTestClass))
-        runner = unittest.TextTestRunner()
-        runner.run(suite)
+    def test_one(self):
+        self.assertTrue(True)
 
-        output = mock_stdout.getvalue()
-        self.assertIn("--- Inventory Statistics for Test Class: AnotherTestClass ---", output)
-        self.assertIn("Total Test Methods Discovered: 2", output)
-        self.assertIn("Total Test Methods Actually Ran: 2", output)
-        self.assertIn("All discovered test methods were executed.", output)
+    def test_two(self):
+        self.assertEqual(1, 1)
 
+    @unittest.skip("Demonstrating a skipped test")
+    def test_skipped(self):
+        self.fail("This test should be skipped")
 
 if __name__ == '__main__':
     unittest.main()

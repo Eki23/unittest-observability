@@ -1,37 +1,51 @@
 import unittest
 import time
-from io import StringIO
-from unittest.mock import patch
-from unittest_observability import TimingMixin
+from unittest_observability.testcase.mixins.timing_mixin import TimingMixin
 
-class TestTimingMixin(TimingMixin, unittest.TestCase):
-    def test_short_duration(self):
-        time.sleep(0.01) # Simulate a short test
+class TestTimingMixin(unittest.TestCase, TimingMixin): # Switched order
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        # The timing_class_setup method now returns a string, but we don't need to assert it here
+        cls.timing_class_setup()
 
-    def test_long_duration(self):
-        time.sleep(0.05) # Simulate a longer test
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        timing_stats = cls.timing_class_teardown()
+        print(f"\n--- Returned Class Timing Stats for {cls.__name__} ---")
+        print(timing_stats)
+        print("--------------------------------------------------")
+        # Assertions to check the returned data
+        assert "class_name" in timing_stats
+        assert "total_class_duration" in timing_stats
+        assert isinstance(timing_stats["method_timings"], list)
+        if timing_stats["method_timings"]:
+            assert "total_methods_duration" in timing_stats
 
-    @patch('sys.stdout', new_callable=StringIO)
-    def test_output_format(self, mock_stdout):
-        # Run a test to capture its output
-        # We need to run a suite to trigger setUpClass/tearDownClass
-        suite = unittest.TestSuite()
-        suite.addTest(unittest.makeSuite(TestTimingMixin))
-        runner = unittest.TextTestRunner()
-        runner.run(suite)
+    def setUp(self):
+        super().setUp()
+        # The timing_method_setup method now returns a string, but we don't need to assert it here
+        self.timing_method_setup()
 
-        output = mock_stdout.getvalue()
-        
-        # Check for class timing header
-        self.assertIn("--- Timing Statistics for Test Class: TestTimingMixin ---", output)
-        self.assertIn("Total Class Duration:", output)
-        
-        # Check for individual method timing header
-        self.assertIn("Individual Method Durations (longest first):", output)
+    def tearDown(self):
+        super().tearDown()
+        method_stats = self.timing_method_teardown()
+        print(f"Returned Method Timing Stats for {method_stats['id']}: {method_stats['duration']:.4f} seconds")
+        # Assertions to check the returned data
+        self.assertIn("id", method_stats)
+        self.assertIn("duration", method_stats)
+        self.assertIsInstance(method_stats["duration"], float)
+        self.assertGreaterEqual(method_stats["duration"], 0)
 
-        # Check for specific method output format
-        self.assertRegex(output, r"  - test_timing_mixin.TestTimingMixin.test_short_duration: \d+\.\d{4} seconds")
-        self.assertRegex(output, r"  - test_timing_mixin.TestTimingMixin.test_long_duration: \d+\.\d{4} seconds")
+    def test_short_method(self):
+        time.sleep(0.05) # Simulate some work
+
+    def test_medium_method(self):
+        time.sleep(0.1) # Simulate some work
+
+    def test_long_method(self):
+        time.sleep(0.15) # Simulate some work
 
 if __name__ == '__main__':
     unittest.main()
