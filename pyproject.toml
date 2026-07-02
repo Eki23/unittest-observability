@@ -1,23 +1,48 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "unittest-observability"
-version = "0.1.0"
+dynamic = ["version"]
 description = "Add a short description here"
-authors = [
-    { name = "Christian Ekiza", email = "ekiza23@gmail.com" },
-]
-dependencies = []
-requires-python = ">=3.12"
 readme = "README.md"
-license = { text = "Apache-2.0" }
+requires-python = ">=3.12"
+license = "Apache-2.0"
+keywords = ["unittest", "observability", "mixins"]
+authors = [
+    {name = "Christian Ekiza", email = "ekiza23@gmail.com"},
+]
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: OS Independent",
+]
+
+dependencies = []
 
 [project.optional-dependencies]
 dev = [
     "coverage",
 ]
 
-[build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
+[project.urls]
+Homepage = "https://github.com/Eki23/unittest-observabilityt"
+Repository = "https://github.com/Eki23/unittest-observability"
+BugTracker = "https://github.com/Eki23/unittest-observability/issues"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+license-files = ["LICENSE"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
+include = ["unittest_observability*"]
+
+[tool.setuptools_scm]
+version_scheme = "post-release"
+local_scheme = "no-local-version"
